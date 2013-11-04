@@ -40,7 +40,7 @@ class HookProtocol(protocol.ProcessProtocol):
                     break
 
             if not skip:
-                msg = "The following patch has been merged:\n"
+                msg = "This patch has been merged:\n\n"
                 msg += "subject: %s\n" % (event["change"]["subject"])
                 msg += "gerrit:  %s\n" % (event["change"]["url"])
                 msg += "gitweb:  http://%s/gitweb/?p=%s.git;a=commitdiff;h=%s\n" % (GERRIT, event["change"]["project"], event["patchSet"]["revision"])
