@@ -1,0 +1,12 @@
+#!/bin/bash
+
+AUTHOR=$1
+PROJECT=$2
+LINK=$3
+TICKET=$4
+API_TOKEN=$5
+
+
+MSG="{\"issue\":{\"notes\":\"${AUTHOR} committed a patch to ${PROJECT}\ngerrit: ${LINK}\"}}"
+
+curl -v -H 'Content-Type: application/json' -X PUT -d "${MSG}" http://woodstock.acer.com.tw/redmine/issues/${TICKET}.json?key=${API_TOKEN}
