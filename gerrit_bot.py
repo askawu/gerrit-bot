@@ -1,5 +1,4 @@
 
-from twisted.internet import reactor
 from twisted.internet import defer
 from twisted.internet import protocol
 import simplejson as json
@@ -7,16 +6,18 @@ import os
 import re
 import subprocess
 
-GERRIT=""
-PROJECT_WHITE_LIST=[]
-HIPCHAT_CLI_SCRIPT="./hipchat_room_message"
-HIPCHAT_AUTH_TOKEN=""
-HIPCHAT_ROOM_ID=""
-BOT_NAME="GIT"
-REDMINE_CLI_SCRIPT="./redmine_update_issue"
-REDMINE_API_KEY=""
+class GerritBot(protocol.ProcessProtocol):
 
-class HookProtocol(protocol.ProcessProtocol):
+    def __init__(self, gerrit, whitelist, token, room, key):
+        self.gerrit = gerrit
+        self.hipchat_white_list = whitelist
+        self.hipchat_auth_token = token
+        self.hipchat_room_id = room
+        self.hipchat_cli = "./hipchat_room_message"
+        self.redmine_api_key = key
+        self.redmine_cli = "./redmine_update_issue"
+        self.bot_name = "GIT"
+
     def outReceived(self, data):
         self.data = data
         lines = self.data.split("\n")
@@ -37,7 +38,7 @@ class HookProtocol(protocol.ProcessProtocol):
 
         if event["type"] == "change-merged":
             skip = True
-            for p in PROJECT_WHITE_LIST:
+            for p in self.hipchat_white_list:
                 if event["change"]["project"] == p:
                     skip = False
                     break
@@ -47,22 +48,28 @@ class HookProtocol(protocol.ProcessProtocol):
                 msg += "project: %s\n" % (event["change"]["project"])
                 msg += "subject: %s\n" % (event["change"]["subject"])
                 msg += "gerrit:  <a href=\"%s\">link</a>\n" % (event["change"]["url"])
-                msg += "gitweb:  <a href=\"http://%s/gitweb/?p=%s.git;a=commitdiff;h=%s\">link</a>\n" % (GERRIT, event["change"]["project"], event["patchSet"]["revision"])
-                p1 = subprocess.Popen(["echo", msg], stdout=subprocess.PIPE)
-                p2 = subprocess.Popen([HIPCHAT_CLI_SCRIPT, "-c", "green", "-t", HIPCHAT_AUTH_TOKEN, "-r", HIPCHAT_ROOM_ID, "-f", BOT_NAME], stdin=p1.stdout, stdout=subprocess.PIPE)
+                msg += "gitweb:  <a href=\"http://%s/gitweb/?p=%s.git;a=commitdiff;h=%s\">link</a>\n" % (self.gerrit, event["change"]["project"], event["patchSet"]["revision"])
+                cmd1 = ["echo", msg]
+                cmd2 = [self.hipchat_cli,
+                        "-c",
+                        "green",
+                        "-t",
+                        self.hipchat_auth_token,
+                        "-r",
+                        self.hipchat_room_id,
+                        "-f",
+                        self.bot_name]
+                p1 = subprocess.Popen(cmd1, stdout=subprocess.PIPE)
+                p2 = subprocess.Popen(cmd2, stdin=p1.stdout, stdout=subprocess.PIPE)
                 p2.communicate()
         elif event["type"] == "patchset-created":
             pattern = re.compile(".*\[t(\d+)\].*")
             match = pattern.match(event["change"]["subject"])
             if match:
-                cmd = [REDMINE_CLI_SCRIPT,
+                cmd = [self.redmine_cli,
                        event["change"]["owner"]["name"],
                        event["change"]["project"],
                        event["change"]["url"],
                        match.group(1),
-                       REDMINE_API_KEY]
+                       self.redmine_api_key]
                 ret = subprocess.call(cmd)
-
-hp = HookProtocol()
-ctrl = reactor.spawnProcess(hp, "ssh", args= ["ssh", "-p", "29418", GERRIT, "gerrit", "stream-events"])
-reactor.run()

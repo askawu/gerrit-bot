@@ -1,7 +1,10 @@
-hipchat-git-bot
+gerritt-bot
 ===============
 
-You can add a git bot for you hipchat room based on gerrit stream events.
+You can add a gerrit bot to do following things
+1. Send a message to hipchat once a patch is merged
+2. Update the redmine ticket once a patch is created and its subject has following format
+   [t${issue-number}], for example, [t1234]
 
 ## Installation
 
@@ -9,15 +12,6 @@ This script need the help of hipchat/hipchat-cli
 
 Clone [hipchat-cli](https://github.com/hipchat/hipchat-cli)
 
-And modify hipchat-git-bot.py for your own setting
+And modify run.py for your own setting
 
-```sh
-
-GERRIT="your_gerrit_server"
-PROJECT_WHITE_LIST=["your_project"]
-HIPCHAT_CLI_SCRIPT="/path/to/hipchat_room_message"
-HIPCHAT_AUTH_TOKEN="hipchat_auth_token"
-HIPCHAT_ROOM_ID="hipchat_room_id"
-BOT_NAME="bot_name"
-```
 aska.wu@acer.com
