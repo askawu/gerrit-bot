@@ -4,7 +4,7 @@ from gerrit_bot import GerritBot
 
 MINNIE="minnie.acer.com.tw"
 MICKEY="mickey.acer.com.tw"
-MINNIE_WHITE_LIST=["acer/dandelion", "acer/conga", "acer/timbero", "acer/bongo", "acer/bolero", "acer/asf", "acer/partyshot"]
+MINNIE_WHITE_LIST=["acer/dandelion", "acer/conga", "acer/timbero", "acer/bongo", "acer/bolero", "acer/asf", "acer/partyshot", "acer/icontrol", "acer/iot/openwrt"]
 MICKEY_WHITE_LIST=[]
 HIPCHAT_AUTH_TOKEN=""
 HIPCHAT_ROOM_ID=""
