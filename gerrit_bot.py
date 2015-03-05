@@ -30,7 +30,7 @@ class GerritBot(protocol.ProcessProtocol):
         try:
             event = json.loads(line.decode('utf-8'))
         except ValueError:
-            defer.succeed(None)
+            return defer.succeed(None)
 
         if not(type(event) == type({}) and "type" in event):
             log.msg("no type in event %s" % (line,))
