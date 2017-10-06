@@ -15,3 +15,5 @@ Clone [hipchat-cli](https://github.com/hipchat/hipchat-cli)
 And modify run.py for your own setting
 
 aska.wu@acer.com
+
+test test
